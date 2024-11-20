@@ -19,8 +19,8 @@ let course;
 export const origin = new THREE.Vector3();
 export const controlPoints = [
     [-50, 20], //変えない！！！！！
-    [40,10],
-    [30,-30],
+    [-10,25],
+    [40,-30],
     [ 25,-40] //変えない！！！！！
 ]
 export function init(scene, size, id, offset, texture) {
@@ -72,11 +72,12 @@ export function init(scene, size, id, offset, texture) {
             geometry,
             material
         )
-        bldg.position.set(offset.x, bldgH/2, offset.z);
+        bldg.position.set(x, bldgH/2, z);
         scene.add(bldg);
     }
-    makeBuilding(20, 20, 0);
-    makeBuilding(-10, 10, 2);
+    makeBuilding(20, 55, 0);
+    makeBuilding(30, 40, 1);
+    makeBuilding(40, 50, 2);
 
     // コース(描画)
     //制御点を補間して曲線を作る
@@ -111,7 +112,7 @@ export function init(scene, size, id, offset, texture) {
 // コース(自動運転用)
 export function makeCourse(scene) {
     const courseVectors = [];
-    const parts = [L4, L1, L2, L3];
+    const parts = [L4, L1, L2, L3];  //時計回りの時
     parts.forEach((part) => {
         part.controlPoints.forEach((p) => {
             courseVectors.push(
@@ -148,6 +149,7 @@ export function resize() {
     renderer.setSize(sizeR, sizeR);
 }
 
+//時計回り
 const clock = new THREE.Clock();
 const carPosition = new THREE.Vector3();
 const carTarget = new THREE.Vector3();
