@@ -53,32 +53,75 @@ export function init(scene, size, id, offset, texture) {
     plane.position.set(offset.x, -0.01, offset.z);
     scene.add(plane);
 
+    // コース(描画)を先に作成
+    course = new THREE.CatmullRomCurve3( 
+        controlPoints.map((p) => {
+            return (new THREE.Vector3()).set( 
+                offset.x + p[0],
+                0,
+                offset.z + p[1]
+            );
+        }), false
+    );
+
     // ビル
     function makeBuilding(x, z, type) {
         const height = [2, 2, 7, 4, 5];
         const bldgH = height[type] * 5;
-        const width = 6 + Math.random() * 4; // 幅をランダムに
-        const depth = 6 + Math.random() * 4; // 奥行きをランダムに
+        const width = 6 + Math.random() * 4;
+        const depth = 6 + Math.random() * 4;
         const geometry = new THREE.BoxGeometry(width, bldgH, depth);
         
-        // ビルの色をランダムに変化させる（グレーの色調）
-        const color = new THREE.Color(
-            0.4 + Math.random() * 0.2,
-            0.4 + Math.random() * 0.2,
-            0.4 + Math.random() * 0.2
-        );
-        
-        const material = new THREE.MeshLambertMaterial({color: color});
+        const material = new THREE.MeshLambertMaterial({map: texture});
+        const sideUvS = (type*2+1)/11;
+        const sideUvE = (type*2+2)/11;
+        const topUvS = (type*2+2)/11;
+        const topUvE = (type*2+3)/11;
+        const uvs = geometry.getAttribute("uv");
+        for (let i = 0; i < 48; i+=4) {
+            if (i < 16 || i > 22) {
+                uvs.array[i] = sideUvS;
+                uvs.array[i+2] = sideUvE;
+            }
+            else {
+                uvs.array[i] = topUvS;
+                uvs.array[i+2] = topUvE;
+            }
+        }
         const bldg = new THREE.Mesh(geometry, material);
         
-        bldg.position.set(
+        // ビルの位置を設定
+        const buildingPos = new THREE.Vector3(
             offset.x + x,
             bldgH/2,
             offset.z + z
         );
+        bldg.position.copy(buildingPos);
         
-        // ビルを少しランダムに回転
-        bldg.rotation.y = Math.random() * Math.PI * 0.1;
+        // 最も近い道路のポイントを見つける
+        let minDist = Infinity;
+        let closestPoint = new THREE.Vector3();
+        let closestT = 0;
+        
+        for (let t = 0; t <= 1; t += 0.01) {
+            const point = course.getPointAt(t);
+            const dist = point.distanceTo(buildingPos);
+            if (dist < minDist) {
+                minDist = dist;
+                closestPoint.copy(point);
+                closestT = t;
+            }
+        }
+        
+        // 道路の接線方向を取得
+        const tangent = course.getTangentAt(closestT);
+        
+        // ビルを道路方向に向ける
+        const angle = Math.atan2(tangent.x, tangent.z);
+        bldg.rotation.y = angle + Math.PI/2; // 90度回転を加えて正面を道路に向ける
+        
+        // わずかなランダム性を追加
+        bldg.rotation.y += (Math.random() - 0.5) * 0.2; // ±0.1ラジアンのランダムな回転
         
         scene.add(bldg);
     }
@@ -89,30 +132,18 @@ export function init(scene, size, id, offset, texture) {
         [5, -8, 4],
         [5, -12, 2],
         [-10, -20, 3],
-        [-9, -5, 4],
+        [-4, -5, 4],
         [-14, 0, 2],
-        [-35, 15, 1],
-        [-25, 8, 3],
-        [-25, 30, 0],
-  
-        // 道路の反対側
+        [-25, 17, 1],
+        [-20, 8, 3],
+        [-20, 30, 0],
     ];
 
     buildingPositions.forEach(pos => {
         makeBuilding(pos[0], pos[1], pos[2]);
     });
 
-    // コース(描画)
-    course = new THREE.CatmullRomCurve3( 
-        controlPoints.map((p) => {
-            return (new THREE. Vector3()).set( 
-                offset.x + p[0],
-                0,
-                offset.z + p[1]
-            );
-        }), false
-    )
-    // 曲線から100箇所を取り出し 円を並べる
+    // 道路の描画
     const points = course.getPoints(100); 
     points.forEach((point)=>{
         const road = new THREE.Mesh (
@@ -151,12 +182,10 @@ export function makeCourse(scene) {
     )
 }
 
-// カメラを返す
 export function getCamera() {
     return camera;
 }
 
-// 車の設定
 export function setCar(scene, car) {
     const SCALE = 0.01;
     car.position.copy(origin);
@@ -164,7 +193,6 @@ export function setCar(scene, car) {
     scene.add(car);
 }
 
-// Windowサイズの変更処理
 export function resize() {
     camera.updateProjectionMatrix();
     const sizeR = 0.2 * window.innerWidth;
