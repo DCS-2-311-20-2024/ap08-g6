@@ -68,9 +68,7 @@ export function init(scene, size, id, offset, texture) {
     function makeBuilding(x, z, type) {
         const height = [2, 2, 7, 4, 5];
         const bldgH = height[type] * 5;
-        const width = 6 + Math.random() * 4;
-        const depth = 6 + Math.random() * 4;
-        const geometry = new THREE.BoxGeometry(width, bldgH, depth);
+        const geometry = new THREE.BoxGeometry(8, bldgH, 8);
         
         const material = new THREE.MeshLambertMaterial({map: texture});
         const sideUvS = (type*2+1)/11;
