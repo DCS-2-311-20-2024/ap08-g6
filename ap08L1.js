@@ -1,17 +1,13 @@
 //
 // 応用プログラミング 第8回 (ap08L1.js)
 //
-// G18400-2021 拓殖太郎
+// G184432023 佐々木真聡
 //
 
 "use strict"; // 厳格モード
 
 // ライブラリをモジュールとして読み込む
 import * as THREE from "three";
-import * as L1 from "./ap08L1.js";
-import * as L2 from "./ap08L2.js";
-import * as L3 from "./ap08L3.js";
-import * as L4 from "./ap08L4.js";
 
 let renderer;
 let camera;
