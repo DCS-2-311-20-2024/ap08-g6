@@ -8,6 +8,10 @@
 
 // ライブラリをモジュールとして読み込む
 import * as THREE from "three";
+import * as L1 from "./ap08L1.js";
+import * as L2 from "./ap08L2.js";
+import * as L3 from "./ap08L3.js";
+import * as L4 from "./ap08L4.js";
 
 let renderer;
 let camera;
@@ -78,6 +82,22 @@ export function init(scene, size, id, offset, texture) {
 
 // コース(自動運転用)
 export function makeCourse(scene) {
+    const courseVectors = [];
+    const parts = [L1, L2, L3, L4];
+    parts.forEach((part) => {
+        part.controlPoints.forEach((p) => {
+            courseVectors.push(
+                new THREE.Vector3(
+                    p[0] + part.origin.x,
+                    0,
+                    p[1] + part.origin.z,
+                )
+            )
+        });
+    })
+    course = new THREE.CatmullRomCurve3(
+        courseVectors, true
+    )
 }
 
 // カメラを返す
@@ -100,7 +120,15 @@ export function resize() {
     renderer.setSize(sizeR, sizeR);
 }
 
+const clock = new THREE.Clock();
+const carPosition = new THREE.Vector3();
+const carTarget = new THREE.Vector3();
 export function render(scene, car) {
+    const time = (clock.getElapsedTime() / 20);
+    course.getPointAt(time % 1, carPosition);
+    car.position.copy(carPosition);
+    course.getPointAt((time + 0.01) %1, carTarget);
+    car.lookAt(carTarget);
     camera.lookAt(car.position.x, car.position.y, car.position.z);
     renderer.render(scene, camera);
 }
