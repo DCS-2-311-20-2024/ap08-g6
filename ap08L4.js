@@ -149,7 +149,7 @@ export function resize() {
     renderer.setSize(sizeR, sizeR);
 }
 
-//時計回り
+// //時計回り
 const clock = new THREE.Clock();
 const carPosition = new THREE.Vector3();
 const carTarget = new THREE.Vector3();
