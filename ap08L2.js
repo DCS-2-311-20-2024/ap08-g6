@@ -1,7 +1,7 @@
 //
 // 応用プログラミング 第8回 (ap08L2.js)
 //
-// G18400-2021 拓殖太郎
+// G38445-2023 佐藤弘斗
 //
 
 "use strict"; // 厳格モード
@@ -62,6 +62,7 @@ export function getCamera() {
 
 // 車の設定
 export function setCar(scene, car) {
+    
 }
 
 // Windowサイズの変更処理
