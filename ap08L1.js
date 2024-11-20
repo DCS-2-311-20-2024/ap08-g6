@@ -77,6 +77,80 @@ export function init(scene, size, id, offset, texture) {
     }
     makeBuilding(20, -25, 2);
     makeBuilding(10, -10, 1);
+    
+    function makeCBRobot(x, z) {
+        // 段ボールロボットの設定
+        const cardboardRobot = new THREE.Group
+        const cardboardMaterial = new THREE.MeshLambertMaterial({ color: 0xccaa77 });
+        const blackMaterial = new THREE.MeshBasicMaterial({color: "black"});
+        const seg = 12; // 円や円柱の分割数
+        const gap = 0.1; // 胸のマークなどを浮かせる高さ
+        const legW = 8; // 脚の幅
+        const legD = 8; // 脚の奥行
+        const legLen = 30; // 脚の長さ
+        const legSep = 12; // 脚の間隔
+        const bodyW = 22; // 胴体の幅
+        const bodyH = 30; // 胴体の高さ
+        const bodyD = 20; // 胴体の奥行
+        const armW = 8; // 腕の幅
+        const armD = 8; // 腕の奥行
+        const armLen = 38; // 腕の長さ
+        const headW = 40; // 頭の幅
+        const headH = 24; // 頭の高さ
+        const headD = 24; // 頭の奥行
+        const eyeRad = 2; // 目の半径
+        const eyeSep = 16; // 目の間隔
+        const eyePos = 2; // 目の位置(顔の中心基準の高さ)
+        const mouthW = 6; // 口の幅
+        const mouthH = 5; // 口の高さ
+        const mouthT = 2; // 口の頂点の位置(顔の中心基準の高さ)
+        //  脚の作成
+        const legGeometry = new THREE.BoxGeometry(legW, legLen, legD);
+        const legL = new THREE.Mesh(legGeometry, cardboardMaterial);
+        legL.position.set(legSep/2, legLen/2, 0);
+        cardboardRobot.add(legL);
+        const legR = new THREE.Mesh(legGeometry, cardboardMaterial);
+        legR.position.set(-legSep/2, legLen/2, 0);
+        cardboardRobot.add(legR);
+        //  胴体の作成
+        const bodyGeometry = new THREE.BoxGeometry(bodyW, bodyH, bodyD);
+        const body = new THREE.Mesh(bodyGeometry, cardboardMaterial);
+        body.position.y = legLen + bodyH/2;
+        cardboardRobot.add(body);
+        //  腕の設定
+        const armGeometry = new THREE.BoxGeometry(armW, armLen, armD);
+        const armR = new THREE.Mesh(armGeometry, cardboardMaterial);
+        armR.position.set(bodyW/2 + armW/2, legLen + bodyH - armLen/2, 0);
+        cardboardRobot.add(armR);
+        const armL = new THREE.Mesh(armGeometry, cardboardMaterial);
+        armL.position.set(-(bodyW/2 + armW/2), legLen + bodyH - armLen/2, 0);
+        cardboardRobot.add(armL);
+        //  頭の設定
+        const headGeometry = new THREE.BoxGeometry(headW, headH, headD);
+        const head = new THREE.Mesh(headGeometry, cardboardMaterial);
+        const circleGeometry = new THREE.CircleGeometry(eyeRad, seg);
+        const eyeL = new THREE.Mesh(circleGeometry, blackMaterial);
+        eyeL.position.set(eyeSep/2, eyePos, headD/2 + gap);
+        head.add(eyeL);
+        const eyeR = new THREE.Mesh(circleGeometry, blackMaterial);
+        eyeR.position.set(-eyeSep/2, eyePos, headD/2 + gap);
+        head.add(eyeR);
+        const triangleGeometry = new THREE.BufferGeometry();
+        const triangleVertices = new Float32Array( [
+            0, -mouthT, headD/2+gap,
+            -mouthW/2, -(mouthT + mouthH), headD/2+gap,
+            mouthW/2, -(mouthT + mouthH), headD/2+gap] );
+        triangleGeometry.setAttribute( 'position',
+            new THREE.BufferAttribute( triangleVertices, 3));
+        head.add(new THREE.Mesh(triangleGeometry, blackMaterial));
+        head.position.y = legLen + bodyH + headH/2;
+        cardboardRobot.add(head);
+        cardboardRobot.position.set(offset.x + x, 0, offset.z + z);
+        scene.add(cardboardRobot);
+    }
+    makeCBRobot(-20, -10);
+    makeCBRobot(9, 30);
+
     // コース(描画)
     // 制御点を補完して曲線を作る
     course = new THREE.CatmullRomCurve3(
