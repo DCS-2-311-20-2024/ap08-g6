@@ -52,6 +52,7 @@ export function init(scene, size, id, offset, texture) {
     plane.rotateX(-Math.PI/2);
     plane.position.set(offset.x, -0.01, offset.z);
     scene.add(plane);
+    
 
     // コース(描画)を先に作成
     course = new THREE.CatmullRomCurve3( 
@@ -64,6 +65,7 @@ export function init(scene, size, id, offset, texture) {
         }), false
     );
 
+    
     // ビル
     function makeBuilding(x, z, type) {
         const height = [2, 2, 7, 4, 5];
@@ -135,12 +137,44 @@ export function init(scene, size, id, offset, texture) {
         [-25, 17, 1],
         [-20, 8, 3],
         [-20, 30, 0],
+
+
     ];
 
     buildingPositions.forEach(pos => {
         makeBuilding(pos[0], pos[1], pos[2]);
     });
 
+    function makeBuilding2(x, z, type) {
+        const height = [2, 2, 7, 4, 5];
+        const bldgH = height[type]*5;
+        const geometry = new THREE.BoxGeometry(40, bldgH, 40);
+        const material = new THREE.MeshLambertMaterial({map: texture});
+        const sideUvS = (type*2+1)/11;
+        const sideUvE = (type*2+2)/11;
+        const topUvS = (type*2+2)/11;
+        const topUvE = (type*2+3)/11;
+        const uvs = geometry.getAttribute("uv");
+        for (let i = 0; i < 48; i+=4){
+            if (i < 16 || i > 22) {
+                uvs.array[i] = sideUvS;
+                uvs.array[i+2] = sideUvE;
+            }
+            else {
+                uvs.array[i] = topUvS;
+                uvs.array[i+2] = topUvE;
+            }
+        }
+        const bldg = new THREE.Mesh(
+            geometry,
+            material
+        )
+        bldg.position.set(0, bldgH/2, 0);
+        scene.add(bldg);
+    }
+    makeBuilding2(0, 0, 3);
+    
+    
     // 道路の描画
     const points = course.getPoints(100); 
     points.forEach((point)=>{
