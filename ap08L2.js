@@ -52,7 +52,7 @@ export function init(scene, size, id, offset, texture) {
         const height = [2, 2, 7, 4, 5];
         const bldgH = height[type] * 5;
         const geometry = new THREE.BoxGeometry(8, bldgH, 8);
-        const material = new THREE.MeshLambertMaterial({color: 0x808080});
+        const material = new THREE.MeshLambertMaterial({map: texture});
         const sideUvS = (type * 2 + 1) / 11;
         const sideUvE = (type * 2 + 2) / 11;
         const topUvS = (type * 2 + 2) / 11;
@@ -73,10 +73,10 @@ export function init(scene, size, id, offset, texture) {
             geometry,
             material
         )
-        bldg.position.set(offset.x/2, 0, offset.y);
+        bldg.position.set(offset.x/2, bldgH/2, offset.z);
         scene.add(bldg);
     }
-    makeBuilding(20,20,0);
+    makeBuilding(10,-5,2);
 
 
     // コース(描画)
