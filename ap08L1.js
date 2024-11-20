@@ -78,7 +78,7 @@ export function init(scene, size, id, offset, texture) {
     makeBuilding(20, -25, 2);
     makeBuilding(10, -10, 1);
     
-    function makeCBRobot(x, z) {
+    function makeCBRobot(x, y, z) {
         // 段ボールロボットの設定
         const cardboardRobot = new THREE.Group
         const cardboardMaterial = new THREE.MeshLambertMaterial({ color: 0xccaa77 });
@@ -145,11 +145,12 @@ export function init(scene, size, id, offset, texture) {
         head.add(new THREE.Mesh(triangleGeometry, blackMaterial));
         head.position.y = legLen + bodyH + headH/2;
         cardboardRobot.add(head);
-        cardboardRobot.position.set(offset.x + x, 0, offset.z + z);
+        cardboardRobot.position.set(offset.x + x, y, offset.z + z);
         scene.add(cardboardRobot);
     }
-    makeCBRobot(-20, -10);
-    makeCBRobot(9, 30);
+    makeCBRobot(-20, 0, -10);
+    makeCBRobot(9, 0, 30);
+    makeCBRobot(-50, 15, 40);
 
     // コース(描画)
     // 制御点を補完して曲線を作る
